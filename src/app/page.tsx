@@ -141,7 +141,7 @@ export default function MarketingPage() {
           {/* CTA buttons */}
           <div className="header-cta">
             <Link
-              href="/login"
+              href="/auth?view=login"
               className="btn-login"
               style={{
                 padding: "8px 16px",
@@ -159,7 +159,7 @@ export default function MarketingPage() {
             </Link>
 
             <Link
-              href="/signup"
+              href="/auth?view=signup"
               className="btn-filled"
               style={{
                 padding: "8px 16px",
@@ -298,7 +298,7 @@ export default function MarketingPage() {
           </nav>
 
           <Link
-            href="/login"
+            href="/auth?view=login"
             className="btn-login"
             onClick={() => setMenuOpen(false)}
             style={{
@@ -320,7 +320,7 @@ export default function MarketingPage() {
           </Link>
 
           <Link
-            href="/signup"
+            href="/auth?view=signup"
             className="btn-filled"
             onClick={() => setMenuOpen(false)}
             style={{
@@ -401,7 +401,7 @@ export default function MarketingPage() {
             {/* CTA buttons */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "var(--spacing-200)" }}>
               <Link
-                href="/signup"
+                href="/auth?view=signup"
                 className="btn-filled"
                 style={{
                   height: "var(--control-height-expanded)",
@@ -680,7 +680,7 @@ export default function MarketingPage() {
                 </ul>
               </div>
               <Link
-                href="/signup"
+                href="/auth?view=signup"
                 className="btn-outlined"
                 style={{
                   marginTop: 24,
@@ -764,7 +764,7 @@ export default function MarketingPage() {
                 </ul>
               </div>
               <Link
-                href="/signup"
+                href="/auth?view=signup"
                 className="btn-filled"
                 style={{
                   marginTop: 24,
@@ -826,7 +826,7 @@ export default function MarketingPage() {
                 </ul>
               </div>
               <Link
-                href="/signup"
+                href="/auth?view=signup"
                 className="btn-outlined"
                 style={{
                   marginTop: 24,
