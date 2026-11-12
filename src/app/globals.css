@@ -1,0 +1,140 @@
+@import "@fontsource-variable/plus-jakarta-sans";
+@import "../../token.css";
+
+/* Ensure font family resolves correctly */
+:root {
+  --font-family: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--surface);
+  color: var(--on-surface);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body-large);
+  line-height: var(--line-height-body-large);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Enforce tabular numerals on all data figures */
+.tabular-nums,
+[data-figure] {
+  font-variant-numeric: var(--font-variant-numeric);
+}
+
+/* Focus indicator conforming to design tokens */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Marketing page: nav links and CTA buttons */
+.nav-link {
+  text-decoration: none;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: color var(--duration-short) var(--easing-standard);
+}
+.nav-link:hover {
+  color: var(--primary);
+}
+
+.btn-filled {
+  background-color: var(--primary);
+  color: var(--on-primary);
+  cursor: pointer;
+  box-shadow: var(--elevation-1);
+  transition: background-color var(--duration-long) var(--easing-standard);
+}
+.btn-filled:hover {
+  background-color: var(--primitive-primary-30);
+}
+
+.btn-outlined {
+  color: var(--primary);
+  border: var(--border-hairline) solid var(--outline);
+  cursor: pointer;
+  box-shadow: var(--elevation-1);
+  transition: color var(--duration-long) var(--easing-standard),
+    border-color var(--duration-long) var(--easing-standard);
+}
+.btn-outlined:hover {
+  color: var(--primitive-primary-30);
+  border-color: var(--primitive-primary-30);
+}
+
+.btn-login {
+  background-color: transparent;
+  color: var(--secondary);
+  border: var(--border-hairline) solid var(--secondary);
+  cursor: pointer;
+  box-shadow: var(--elevation-1);
+  transition: color var(--duration-long) var(--easing-standard),
+    border-color var(--duration-long) var(--easing-standard);
+}
+.btn-login:hover {
+  color: var(--primitive-secondary-30);
+  border-color: var(--primitive-secondary-30);
+}
+
+/* Marketing page: header responsive behaviour */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-300);
+}
+.header-cta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-200);
+}
+.header-hamburger {
+  display: none;
+}
+
+@media (max-width: 840px) {
+  .header-nav,
+  .header-cta {
+    display: none;
+  }
+  .header-hamburger {
+    display: inline-flex;
+  }
+}
+
+/* Skip link (visually hidden until focused) */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 200;
+  background: var(--primary);
+  color: var(--on-primary);
+  padding: var(--spacing-100) var(--spacing-200);
+  border-radius: var(--radius-medium);
+  text-decoration: none;
+}
+.skip-link:focus {
+  left: var(--spacing-200);
+  top: var(--spacing-200);
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

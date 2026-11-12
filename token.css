@@ -1,0 +1,669 @@
+/**
+ * Kujera Design System - CSS Custom Properties
+ * Source of truth: kujera-design-tokens-v2.json
+ *
+ * IMPORTANT ARCHITECTURE RULES:
+ * 1. PRIMITIVES (Tier 1, prefixed with --primitive-):
+ *    Raw color palette tones and key seeds. DO NOT USE DIRECTLY IN UI COMPONENTS.
+ * 2. SEMANTIC COLOR ROLES (Tier 2, --primary, --surface, etc.):
+ *    Purpose-driven semantic roles referencing primitives via var().
+ *    ALWAYS USE THESE DIRECTLY IN UI COMPONENTS.
+ * 3. STATUS COLORS:
+ *    Use --success, --pending, --error, --neutral-status only for their defined meanings.
+ * 4. LIGHT MODE ONLY:
+ *    Version one is locked to light mode.
+ */
+
+:root {
+
+  /* ==========================================================================
+     1. PRIMITIVE COLLECTION (TIER 1 - PALETTES & KEY SEEDS)
+     DO NOT CONSUME DIRECTLY IN UI COMPONENTS.
+     Use Semantic Color Roles (Tier 2) below instead.
+     ========================================================================== */
+
+  /* --- Primitive Key Colors (Seed Values) --- */
+  /* Indigo seed. Primary role uses tone 40. */
+  --primitive-primary-key: #3D4DB7;
+  /* Indigo at low chroma (16). */
+  --primitive-secondary-key: #5B5D72;
+  /* Indigo at medium chroma (32). Monochromatic scheme. */
+  --primitive-tertiary-key: #545B8B;
+  /* Indigo hue at chroma 2. Surfaces and text. */
+  --primitive-neutral-key: #787678;
+  /* Indigo hue at chroma 4. Outlines and secondary text. */
+  --primitive-neutral-variant-key: #78767A;
+  /* Expired, denied, failed. */
+  --primitive-error-key: #B22154;
+  /* Provisional access, pending confirmation. Role pins this key, which is tone 44. */
+  --primitive-pending-key: #8A6100;
+  /* Active, paid, allowed. Role pins this key, which is tone 45. */
+  --primitive-success-key: #1E7B3A;
+
+  /* --- Primitive Color Palette Tones --- */
+
+  /* Palette: primary */
+  --primitive-primary-0: #000000;
+  --primitive-primary-10: #000D60;
+  --primitive-primary-20: #091F8F;
+  --primitive-primary-30: #2A3AA5;
+  --primitive-primary-40: #4454BE;
+  --primitive-primary-50: #5E6ED9;
+  --primitive-primary-60: #7888F5;
+  --primitive-primary-70: #98A5FF;
+  --primitive-primary-80: #BBC3FF;
+  --primitive-primary-90: #DFE0FF;
+  --primitive-primary-95: #F0EFFF;
+  --primitive-primary-98: #FBF8FF;
+  --primitive-primary-99: #FFFBFF;
+  --primitive-primary-100: #FFFFFF;
+
+  /* Palette: secondary */
+  --primitive-secondary-0: #000000;
+  --primitive-secondary-10: #181A2C;
+  --primitive-secondary-20: #2D2F42;
+  --primitive-secondary-30: #434559;
+  --primitive-secondary-40: #5B5D72;
+  --primitive-secondary-50: #74768B;
+  --primitive-secondary-60: #8E8FA6;
+  --primitive-secondary-70: #A8A9C1;
+  --primitive-secondary-80: #C4C5DD;
+  --primitive-secondary-90: #E0E1F9;
+  --primitive-secondary-95: #F0EFFF;
+  --primitive-secondary-98: #FBF8FF;
+  --primitive-secondary-99: #FFFBFF;
+  --primitive-secondary-100: #FFFFFF;
+
+  /* Palette: tertiary */
+  --primitive-tertiary-0: #000000;
+  --primitive-tertiary-10: #101744;
+  --primitive-tertiary-20: #262D5A;
+  --primitive-tertiary-30: #3D4372;
+  --primitive-tertiary-40: #545B8B;
+  --primitive-tertiary-50: #6D74A5;
+  --primitive-tertiary-60: #878DC1;
+  --primitive-tertiary-70: #A1A8DD;
+  --primitive-tertiary-80: #BDC3FA;
+  --primitive-tertiary-90: #DFE0FF;
+  --primitive-tertiary-95: #F0EFFF;
+  --primitive-tertiary-98: #FBF8FF;
+  --primitive-tertiary-99: #FFFBFF;
+  --primitive-tertiary-100: #FFFFFF;
+
+  /* Palette: neutral */
+  --primitive-neutral-0: #000000;
+  --primitive-neutral-4: #0E0E0F;
+  --primitive-neutral-6: #131315;
+  --primitive-neutral-10: #1C1B1D;
+  --primitive-neutral-12: #201F21;
+  --primitive-neutral-17: #2A2A2B;
+  --primitive-neutral-20: #313032;
+  --primitive-neutral-22: #353436;
+  --primitive-neutral-24: #3A393A;
+  --primitive-neutral-30: #474648;
+  --primitive-neutral-40: #5F5E5F;
+  --primitive-neutral-50: #787678;
+  --primitive-neutral-60: #929092;
+  --primitive-neutral-70: #ADAAAC;
+  --primitive-neutral-80: #C9C6C7;
+  --primitive-neutral-87: #DCD9DB;
+  --primitive-neutral-90: #E5E1E3;
+  --primitive-neutral-92: #EBE7E9;
+  --primitive-neutral-94: #F0EDEF;
+  --primitive-neutral-95: #F3F0F1;
+  --primitive-neutral-96: #F6F3F4;
+  --primitive-neutral-98: #FCF8FA;
+  --primitive-neutral-99: #FFFBFF;
+  --primitive-neutral-100: #FFFFFF;
+
+  /* Palette: neutral-variant */
+  --primitive-neutral-variant-0: #000000;
+  --primitive-neutral-variant-4: #0E0E11;
+  --primitive-neutral-variant-6: #131316;
+  --primitive-neutral-variant-10: #1B1B1F;
+  --primitive-neutral-variant-12: #1F1F23;
+  --primitive-neutral-variant-17: #2A2A2D;
+  --primitive-neutral-variant-20: #303034;
+  --primitive-neutral-variant-22: #353438;
+  --primitive-neutral-variant-24: #39393C;
+  --primitive-neutral-variant-30: #47464A;
+  --primitive-neutral-variant-40: #5F5E62;
+  --primitive-neutral-variant-50: #78767A;
+  --primitive-neutral-variant-60: #929094;
+  --primitive-neutral-variant-70: #ACAAAF;
+  --primitive-neutral-variant-80: #C8C5CA;
+  --primitive-neutral-variant-87: #DCD9DE;
+  --primitive-neutral-variant-90: #E4E1E6;
+  --primitive-neutral-variant-92: #EAE7EC;
+  --primitive-neutral-variant-94: #F0EDF1;
+  --primitive-neutral-variant-95: #F3F0F4;
+  --primitive-neutral-variant-96: #F6F2F7;
+  --primitive-neutral-variant-98: #FBF8FD;
+  --primitive-neutral-variant-99: #FFFBFF;
+  --primitive-neutral-variant-100: #FFFFFF;
+
+  /* Palette: error */
+  --primitive-error-0: #000000;
+  --primitive-error-10: #3F0017;
+  --primitive-error-20: #66002A;
+  --primitive-error-30: #90003E;
+  --primitive-error-40: #B22154;
+  --primitive-error-50: #D43D6C;
+  --primitive-error-60: #F65785;
+  --primitive-error-70: #FF85A3;
+  --primitive-error-80: #FFB1C1;
+  --primitive-error-90: #FFD9DF;
+  --primitive-error-95: #FFECEE;
+  --primitive-error-98: #FFF8F7;
+  --primitive-error-99: #FFFBFF;
+  --primitive-error-100: #FFFFFF;
+
+  /* Palette: pending */
+  --primitive-pending-0: #000000;
+  --primitive-pending-10: #271900;
+  --primitive-pending-20: #422C00;
+  --primitive-pending-30: #5F4100;
+  --primitive-pending-40: #7D5700;
+  --primitive-pending-50: #9B6F14;
+  --primitive-pending-60: #B7892E;
+  --primitive-pending-70: #D5A346;
+  --primitive-pending-80: #F3BE5E;
+  --primitive-pending-90: #FFDEA9;
+  --primitive-pending-95: #FFEED8;
+  --primitive-pending-98: #FFF8F3;
+  --primitive-pending-99: #FFFBFF;
+  --primitive-pending-100: #FFFFFF;
+
+  /* Palette: success */
+  --primitive-success-0: #000000;
+  --primitive-success-10: #002109;
+  --primitive-success-20: #003914;
+  --primitive-success-30: #005320;
+  --primitive-success-40: #056D2E;
+  --primitive-success-50: #2D8745;
+  --primitive-success-60: #4AA25C;
+  --primitive-success-70: #65BE74;
+  --primitive-success-80: #80DA8D;
+  --primitive-success-90: #9CF7A7;
+  --primitive-success-95: #C5FFC8;
+  --primitive-success-98: #EBFFE7;
+  --primitive-success-99: #F6FFF1;
+  --primitive-success-100: #FFFFFF;
+
+  /* --- Primitive Chart Palette --- */
+  /* First series. Indigo. Charts only, never status. */
+  --chart-1: #4B57A9;
+  --primitive-chart-1: #4B57A9;
+  /* Second series. Teal blue, clear of success green. Charts only, never status. */
+  --chart-2: #008392;
+  --primitive-chart-2: #008392;
+  /* Third series. Violet. Charts only, never status. */
+  --chart-3: #9776B9;
+  --primitive-chart-3: #9776B9;
+  /* Fourth series or "other". Grey. Charts only, never status. */
+  --chart-4: #90909A;
+  --primitive-chart-4: #90909A;
+  /* Target lines and highlights. Light indigo. Charts only, never status. */
+  --chart-5: #7E87CA;
+  --primitive-chart-5: #7E87CA;
+
+  /* ==========================================================================
+     2. COLOR ROLES (TIER 2 - SEMANTIC UI TOKENS)
+     USE THESE DIRECTLY IN UI COMPONENTS.
+     These reference primitive variables via var().
+     ========================================================================== */
+
+  /* --- Brand Roles: Primary --- */
+  /* Main buttons, active nav, links, focus ring. One filled primary button per screen. */
+  --primary: var(--primitive-primary-40);
+  --on-primary: var(--primitive-primary-100);
+  --primary-container: var(--primitive-primary-90);
+  --on-primary-container: var(--primitive-primary-10);
+  --primary-fixed: var(--primitive-primary-90);
+  --primary-fixed-dim: var(--primitive-primary-80);
+  --on-primary-fixed: var(--primitive-primary-10);
+  --on-primary-fixed-variant: var(--primitive-primary-30);
+
+  /* --- Brand Roles: Secondary --- */
+  /* Main secondary fill. Text on it uses on-secondary. */
+  --secondary: var(--primitive-secondary-40);
+  --on-secondary: var(--primitive-secondary-100);
+  --secondary-container: var(--primitive-secondary-90);
+  --on-secondary-container: var(--primitive-secondary-10);
+  --secondary-fixed: var(--primitive-secondary-90);
+  --secondary-fixed-dim: var(--primitive-secondary-80);
+  --on-secondary-fixed: var(--primitive-secondary-10);
+  --on-secondary-fixed-variant: var(--primitive-secondary-30);
+
+  /* --- Brand Roles: Tertiary --- */
+  /* Main tertiary fill. Text on it uses on-tertiary. */
+  --tertiary: var(--primitive-tertiary-40);
+  --on-tertiary: var(--primitive-tertiary-100);
+  --tertiary-container: var(--primitive-tertiary-90);
+  --on-tertiary-container: var(--primitive-tertiary-10);
+  --tertiary-fixed: var(--primitive-tertiary-90);
+  --tertiary-fixed-dim: var(--primitive-tertiary-80);
+  --on-tertiary-fixed: var(--primitive-tertiary-10);
+  --on-tertiary-fixed-variant: var(--primitive-tertiary-30);
+
+  /* --- Status Roles: Success (Active, Paid, Allowed, Invite Accepted) --- */
+  /* Active plan, paid invoice, check-in allowed. */
+  --success: var(--primitive-success-key);
+  --on-success: var(--primitive-success-100);
+  /* Banner and soft badge background for success. */
+  --success-container: var(--primitive-success-95);
+  --on-success-container: var(--primitive-success-20);
+
+  /* --- Status Roles: Pending (Provisional, Pending Confirmation, Expiring) --- */
+  /* Provisional access, waiting for confirmation. */
+  --pending: var(--primitive-pending-key);
+  --on-pending: var(--primitive-pending-100);
+  /* Banner and soft badge background for pending. */
+  --pending-container: var(--primitive-pending-95);
+  --on-pending-container: var(--primitive-pending-20);
+
+  /* --- Status Roles: Error (Expired, Denied, Payment Failed, Transfer > 24h) --- */
+  /* Expired plan, check-in denied, payment failed. Never decoration. */
+  --error: var(--primitive-error-40);
+  --on-error: var(--primitive-error-100);
+  /* Banner and soft badge background for error. */
+  --error-container: var(--primitive-error-95);
+  --on-error-container: var(--primitive-error-20);
+
+  /* --- Status Roles: Neutral Status (Scheduled, Cancelled, No Plan, Unpaid) --- */
+  /* No plan, cancelled, frozen. */
+  --neutral-status: var(--primitive-neutral-variant-40);
+  --on-neutral-status: var(--primitive-neutral-variant-100);
+  --neutral-status-container: var(--primitive-neutral-variant-90);
+  --on-neutral-status-container: var(--primitive-neutral-variant-10);
+
+  /* --- Surfaces, Backgrounds & Outlines --- */
+  /* Page background. */
+  --surface: var(--primitive-neutral-98);
+  /* Body text and icons. */
+  --on-surface: var(--primitive-neutral-10);
+  --surface-variant: var(--primitive-neutral-variant-90);
+  /* Secondary text, inactive icons. */
+  --on-surface-variant: var(--primitive-neutral-variant-30);
+  /* Cards and tables. */
+  --surface-container-lowest: var(--primitive-neutral-100);
+  /* Sidebar and grouped areas. */
+  --surface-container-low: var(--primitive-neutral-96);
+  /* Top bars, inputs at rest. */
+  --surface-container: var(--primitive-neutral-94);
+  /* Hover on low containers, search fields. */
+  --surface-container-high: var(--primitive-neutral-92);
+  /* Selected rows, tracks. */
+  --surface-container-highest: var(--primitive-neutral-90);
+  --surface-dim: var(--primitive-neutral-87);
+  --surface-bright: var(--primitive-neutral-98);
+  /* Toasts and the offline banner. */
+  --inverse-surface: var(--primitive-neutral-20);
+  --inverse-on-surface: var(--primitive-neutral-95);
+  /* Links on inverse surface. */
+  --inverse-primary: var(--primitive-primary-80);
+  --surface-tint: var(--primitive-primary-40);
+  /* Input borders, outlined buttons. */
+  --outline: var(--primitive-neutral-variant-50);
+  /* Dividers and card borders. Decorative only. */
+  --outline-variant: var(--primitive-neutral-variant-80);
+  /* Behind dialogs at 32% opacity. */
+  --scrim: var(--primitive-neutral-0);
+  --shadow: var(--primitive-neutral-0);
+
+  /* ==========================================================================
+     3. FONT SETTINGS & TYPOGRAPHY
+     Plus Jakarta Sans, locked scale (15 styles)
+     ========================================================================== */
+  /* --- Font Settings --- */
+  /* Self-hosted variable font, Latin subset, weights 400 to 600, font-display swap. */
+  --font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  /* Every amount, count and time. */
+  --numeric-figures: tabular-nums;
+  --font-variant-numeric: var(--numeric-figures);
+
+  /* --- Typography Scale (Base / Expanded) --- */
+  /* display-large: Marketing hero, big money totals. */
+  --font-size-display-large: 56px;
+  --line-height-display-large: 64px;
+  --font-weight-display-large: 600;
+  --letter-spacing-display-large: -1px;
+  --font-display-large: var(--font-weight-display-large) var(--font-size-display-large) / var(--line-height-display-large) var(--font-family);
+
+  /* display-medium: Marketing section headings. */
+  --font-size-display-medium: 44px;
+  --line-height-display-medium: 52px;
+  --font-weight-display-medium: 600;
+  --letter-spacing-display-medium: -0.8px;
+  --font-display-medium: var(--font-weight-display-medium) var(--font-size-display-medium) / var(--line-height-display-medium) var(--font-family);
+
+  /* display-small: Door result headline. */
+  --font-size-display-small: 36px;
+  --line-height-display-small: 44px;
+  --font-weight-display-small: 600;
+  --letter-spacing-display-small: -0.5px;
+  --font-display-small: var(--font-weight-display-small) var(--font-size-display-small) / var(--line-height-display-small) var(--font-family);
+
+  /* headline-large: Page titles. */
+  --font-size-headline-large: 32px;
+  --line-height-headline-large: 40px;
+  --font-weight-headline-large: 600;
+  --letter-spacing-headline-large: -0.4px;
+  --font-headline-large: var(--font-weight-headline-large) var(--font-size-headline-large) / var(--line-height-headline-large) var(--font-family);
+
+  /* headline-medium: Key figures on cards. */
+  --font-size-headline-medium: 28px;
+  --line-height-headline-medium: 36px;
+  --font-weight-headline-medium: 600;
+  --letter-spacing-headline-medium: -0.3px;
+  --font-headline-medium: var(--font-weight-headline-medium) var(--font-size-headline-medium) / var(--line-height-headline-medium) var(--font-family);
+
+  /* headline-small: Section titles. */
+  --font-size-headline-small: 24px;
+  --line-height-headline-small: 32px;
+  --font-weight-headline-small: 600;
+  --letter-spacing-headline-small: -0.2px;
+  --font-headline-small: var(--font-weight-headline-small) var(--font-size-headline-small) / var(--line-height-headline-small) var(--font-family);
+
+  /* title-large: Card and panel titles. */
+  --font-size-title-large: 20px;
+  --line-height-title-large: 28px;
+  --font-weight-title-large: 600;
+  --letter-spacing-title-large: 0;
+  --font-title-large: var(--font-weight-title-large) var(--font-size-title-large) / var(--line-height-title-large) var(--font-family);
+
+  /* title-medium: Row titles, member names. */
+  --font-size-title-medium: 16px;
+  --line-height-title-medium: 24px;
+  --font-weight-title-medium: 600;
+  --letter-spacing-title-medium: 0;
+  --font-title-medium: var(--font-weight-title-medium) var(--font-size-title-medium) / var(--line-height-title-medium) var(--font-family);
+
+  /* title-small: Table headers, small titles. */
+  --font-size-title-small: 14px;
+  --line-height-title-small: 20px;
+  --font-weight-title-small: 600;
+  --letter-spacing-title-small: 0;
+  --font-title-small: var(--font-weight-title-small) var(--font-size-title-small) / var(--line-height-title-small) var(--font-family);
+
+  /* body-large: Main reading text, Ask answers. */
+  --font-size-body-large: 16px;
+  --line-height-body-large: 24px;
+  --font-weight-body-large: 400;
+  --letter-spacing-body-large: 0;
+  --font-body-large: var(--font-weight-body-large) var(--font-size-body-large) / var(--line-height-body-large) var(--font-family);
+
+  /* body-medium: Default UI text, table cells. */
+  --font-size-body-medium: 14px;
+  --line-height-body-medium: 20px;
+  --font-weight-body-medium: 400;
+  --letter-spacing-body-medium: 0;
+  --font-body-medium: var(--font-weight-body-medium) var(--font-size-body-medium) / var(--line-height-body-medium) var(--font-family);
+
+  /* body-small: Freshness lines, hints. */
+  --font-size-body-small: 12px;
+  --line-height-body-small: 16px;
+  --font-weight-body-small: 400;
+  --letter-spacing-body-small: 0.1px;
+  --font-body-small: var(--font-weight-body-small) var(--font-size-body-small) / var(--line-height-body-small) var(--font-family);
+
+  /* label-large: Buttons, tabs. */
+  --font-size-label-large: 14px;
+  --line-height-label-large: 20px;
+  --font-weight-label-large: 500;
+  --letter-spacing-label-large: 0.1px;
+  --font-label-large: var(--font-weight-label-large) var(--font-size-label-large) / var(--line-height-label-large) var(--font-family);
+
+  /* label-medium: Status chips, badges. */
+  --font-size-label-medium: 12px;
+  --line-height-label-medium: 16px;
+  --font-weight-label-medium: 500;
+  --letter-spacing-label-medium: 0.2px;
+  --font-label-medium: var(--font-weight-label-medium) var(--font-size-label-medium) / var(--line-height-label-medium) var(--font-family);
+
+  /* label-small: Tags such as Offline. */
+  --font-size-label-small: 11px;
+  --line-height-label-small: 16px;
+  --font-weight-label-small: 500;
+  --letter-spacing-label-small: 0.3px;
+  --font-label-small: var(--font-weight-label-small) var(--font-size-label-small) / var(--line-height-label-small) var(--font-family);
+
+  /* --- Explicit Compact Typography Tokens (For direct compact styling) --- */
+  --font-size-display-large-compact: 40px;
+  --line-height-display-large-compact: 48px;
+  --font-display-large-compact: var(--font-weight-display-large) var(--font-size-display-large-compact) / var(--line-height-display-large-compact) var(--font-family);
+  --font-size-display-medium-compact: 36px;
+  --line-height-display-medium-compact: 44px;
+  --font-display-medium-compact: var(--font-weight-display-medium) var(--font-size-display-medium-compact) / var(--line-height-display-medium-compact) var(--font-family);
+  --font-size-display-small-compact: 32px;
+  --line-height-display-small-compact: 40px;
+  --font-display-small-compact: var(--font-weight-display-small) var(--font-size-display-small-compact) / var(--line-height-display-small-compact) var(--font-family);
+  --font-size-headline-large-compact: 28px;
+  --line-height-headline-large-compact: 36px;
+  --font-headline-large-compact: var(--font-weight-headline-large) var(--font-size-headline-large-compact) / var(--line-height-headline-large-compact) var(--font-family);
+  --font-size-headline-medium-compact: 24px;
+  --line-height-headline-medium-compact: 32px;
+  --font-headline-medium-compact: var(--font-weight-headline-medium) var(--font-size-headline-medium-compact) / var(--line-height-headline-medium-compact) var(--font-family);
+  --font-size-headline-small-compact: 22px;
+  --line-height-headline-small-compact: 28px;
+  --font-headline-small-compact: var(--font-weight-headline-small) var(--font-size-headline-small-compact) / var(--line-height-headline-small-compact) var(--font-family);
+
+
+  /* ==========================================================================
+     4. SPACING SCALE
+     Fixed spacing grid steps
+     ========================================================================== */
+  --spacing-0: 0;
+  --spacing-25: 2px;
+  --spacing-50: 4px;
+  --spacing-100: 8px;
+  --spacing-150: 12px;
+  --spacing-200: 16px;
+  --spacing-250: 20px;
+  --spacing-300: 24px;
+  --spacing-400: 32px;
+  --spacing-500: 40px;
+  --spacing-600: 48px;
+  --spacing-800: 64px;
+  --spacing-1000: 80px;
+  --spacing-1200: 96px;
+
+  /* ==========================================================================
+     5. SPACING ROLES (LAYOUT INTENT)
+     Provides explicit compact and expanded tokens, plus dynamic responsive variables.
+     ========================================================================== */
+  /* --- Explicit Compact Layout Tokens (< 840px) --- */
+  --page-margin-compact: var(--spacing-200);
+  --section-gap-compact: var(--spacing-300);
+  --card-padding-compact: var(--spacing-200);
+  --card-gap-compact: var(--spacing-150);
+  --stack-gap-compact: var(--spacing-100);
+  --inline-gap-compact: var(--spacing-100);
+  --tight-gap-compact: var(--spacing-50);
+  --list-row-padding-y-compact: var(--spacing-150);
+  --table-cell-padding-y-compact: var(--spacing-150);
+  --table-cell-padding-x-compact: var(--spacing-150);
+  --form-gap-compact: var(--spacing-200);
+  --dialog-padding-compact: var(--spacing-300);
+  --marketing-section-gap-compact: var(--spacing-800);
+
+  /* --- Explicit Expanded Layout Tokens (>= 840px) --- */
+  --page-margin-expanded: var(--spacing-400);
+  --section-gap-expanded: var(--spacing-400);
+  --card-padding-expanded: var(--spacing-250);
+  --card-gap-expanded: var(--spacing-200);
+  --stack-gap-expanded: var(--spacing-100);
+  --inline-gap-expanded: var(--spacing-100);
+  --tight-gap-expanded: var(--spacing-50);
+  --list-row-padding-y-expanded: var(--spacing-150);
+  --table-cell-padding-y-expanded: var(--spacing-150);
+  --table-cell-padding-x-expanded: var(--spacing-200);
+  --form-gap-expanded: var(--spacing-200);
+  --dialog-padding-expanded: var(--spacing-300);
+  --marketing-section-gap-expanded: var(--spacing-1000);
+
+  /* --- Dynamic Responsive Tokens (Default: Compact / Mobile-first) --- */
+  /* Below 840px wide. */
+  --page-margin: var(--page-margin-compact);
+  --section-gap: var(--section-gap-compact);
+  --card-padding: var(--card-padding-compact);
+  --card-gap: var(--card-gap-compact);
+  --stack-gap: var(--stack-gap-compact);
+  --inline-gap: var(--inline-gap-compact);
+  --tight-gap: var(--tight-gap-compact);
+  --list-row-padding-y: var(--list-row-padding-y-compact);
+  --table-cell-padding-y: var(--table-cell-padding-y-compact);
+  --table-cell-padding-x: var(--table-cell-padding-x-compact);
+  --form-gap: var(--form-gap-compact);
+  --dialog-padding: var(--dialog-padding-compact);
+  --marketing-section-gap: var(--marketing-section-gap-compact);
+
+  /* ==========================================================================
+     6. SIZES & TARGETS
+     Minimum touch targets, heights and structural widths
+     ========================================================================== */
+  /* Smallest tap area for any control. */
+  --target-min: 48px;
+  /* Buttons and inputs below 840px. */
+  --control-height-compact: 48px;
+  /* Buttons and inputs from 840px. Tap area stays 48 on touch screens. */
+  --control-height-expanded: 40px;
+  /* Filter chips and small buttons. Pad the tap area to 48. */
+  --control-height-small: 32px;
+  --icon-small: 16px;
+  /* Default icon. */
+  --icon-medium: 20px;
+  --icon-large: 24px;
+  /* Member initials. */
+  --avatar: 40px;
+  /* Owner and desk navigation from 840px. */
+  --sidebar-width: 240px;
+  /* Main content area. */
+  --content-max-width: 1200px;
+
+  /* ==========================================================================
+     7. BORDER RADIUS
+     ========================================================================== */
+  --radius-none: 0;
+  --radius-small: 4px;
+  --radius-medium: 8px;
+  --radius-large: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ==========================================================================
+     8. BREAKPOINTS
+     ========================================================================== */
+  --breakpoint-compact: 0;
+  --breakpoint-medium: 600px;
+  --breakpoint-expanded: 840px;
+  --breakpoint-large: 1200px;
+
+  /* ==========================================================================
+     9. BORDERS & FOCUS RINGS
+     ========================================================================== */
+  /* Card borders, dividers. */
+  --border-hairline: 1px;
+  /* Selected card, focus. */
+  --border-strong: 2px;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  /* Visible on every focused control. */
+  --focus-ring-color: var(--primary);
+
+  /* ==========================================================================
+     10. OPACITY & STATES
+     Interaction state layers and content disabling
+     ========================================================================== */
+  /* Overlay of the content colour on hover. */
+  --opacity-state-hover: 0.08;
+  --state-hover: var(--opacity-state-hover);
+  --opacity-state-focus: 0.1;
+  --state-focus: var(--opacity-state-focus);
+  --opacity-state-pressed: 0.1;
+  --state-pressed: var(--opacity-state-pressed);
+  --opacity-state-dragged: 0.16;
+  --state-dragged: var(--opacity-state-dragged);
+  /* Text and icons of a disabled control. */
+  --opacity-disabled-content: 0.38;
+  --disabled-content: var(--opacity-disabled-content);
+  /* Fill of a disabled control. */
+  --opacity-disabled-container: 0.12;
+  --disabled-container: var(--opacity-disabled-container);
+  /* Behind dialogs. */
+  --opacity-scrim: 0.32;
+  --scrim: var(--opacity-scrim);
+
+  /* ==========================================================================
+     11. MOTION
+     Durations & easing curve. Respect prefers-reduced-motion.
+     ========================================================================== */
+  /* Hover, press, toggles. */
+  --duration-short: 100ms;
+  /* Panels, toasts, tabs. */
+  --duration-medium: 200ms;
+  /* Dialogs, sheets. */
+  --duration-long: 300ms;
+  /* Every transition. Respect prefers-reduced-motion. */
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ==========================================================================
+     12. ICONOGRAPHY
+     ========================================================================== */
+  --icon-set: "Lucide";
+  --icon-stroke: 2;
+
+  /* ==========================================================================
+     13. ELEVATION & SHADOWS
+     Flat cards with borders by default; shadows only for floating elements.
+     ========================================================================== */
+  /* Cards on hover, sticky headers. */
+  --elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+  /* Menus, popovers, toasts. */
+  --elevation-2: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
+  /* Dialogs and sheets. */
+  --elevation-3: 0 8px 24px 0 rgba(0, 0, 0, 0.14);
+}
+
+/* ==========================================================================
+   RESPONSIVE TYPOGRAPHY (< 600px / Compact Viewports)
+   Under 600px wide, display and headline styles step down to compact sizes.
+   ========================================================================== */
+@media (max-width: 599.98px) {
+  :root {
+    --font-size-display-large: var(--font-size-display-large-compact);
+    --line-height-display-large: var(--line-height-display-large-compact);
+    --font-display-large: var(--font-display-large-compact);
+    --font-size-display-medium: var(--font-size-display-medium-compact);
+    --line-height-display-medium: var(--line-height-display-medium-compact);
+    --font-display-medium: var(--font-display-medium-compact);
+    --font-size-display-small: var(--font-size-display-small-compact);
+    --line-height-display-small: var(--line-height-display-small-compact);
+    --font-display-small: var(--font-display-small-compact);
+    --font-size-headline-large: var(--font-size-headline-large-compact);
+    --line-height-headline-large: var(--line-height-headline-large-compact);
+    --font-headline-large: var(--font-headline-large-compact);
+    --font-size-headline-medium: var(--font-size-headline-medium-compact);
+    --line-height-headline-medium: var(--line-height-headline-medium-compact);
+    --font-headline-medium: var(--font-headline-medium-compact);
+    --font-size-headline-small: var(--font-size-headline-small-compact);
+    --line-height-headline-small: var(--line-height-headline-small-compact);
+    --font-headline-small: var(--font-headline-small-compact);
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE SPACING ROLES (>= 840px / Expanded Viewports)
+   840px wide and up: page-margin, gaps and paddings scale up to expanded values.
+   ========================================================================== */
+@media (min-width: 840px) {
+  :root {
+    --page-margin: var(--page-margin-expanded);
+    --section-gap: var(--section-gap-expanded);
+    --card-padding: var(--card-padding-expanded);
+    --card-gap: var(--card-gap-expanded);
+    --table-cell-padding-x: var(--table-cell-padding-x-expanded);
+    --marketing-section-gap: var(--marketing-section-gap-expanded);
+  }
+}

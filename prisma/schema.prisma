@@ -1,0 +1,893 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+  extensions = [btree_gist]
+}
+
+// ---------- Enums ----------
+
+enum SessionRole {
+  MEMBER
+  DESK
+  OWNER
+}
+
+enum StaffRole {
+  OWNER
+  DESK
+}
+
+enum PlanType {
+  DAY_PASS
+  WEEKLY
+  MONTHLY
+  DEDICATED_DESK
+  PRIVATE_OFFICE
+}
+
+enum MembershipStatus {
+  SCHEDULED
+  ACTIVE
+  PROVISIONAL
+  EXPIRED
+  CANCELLED
+}
+
+enum MembershipEventType {
+  CREATED
+  RENEWED
+  PLAN_CHANGED
+  PROVISIONAL_STARTED
+  PROVISIONAL_ENDED
+  EXPIRED
+  CANCELLED
+  REVERSED
+}
+
+enum CreditEntryType {
+  OPENING
+  GRANT
+  BOOKING_DEBIT
+  BOOKING_REFUND
+  OVERRUN_DEBIT
+  FORFEIT
+  ADJUSTMENT
+}
+
+enum BookingSource {
+  MEMBER_CREDITS
+  DESK_HIRE
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum CheckInMethod {
+  CODE_SCAN
+  PHONE_LOOKUP
+}
+
+enum CheckInResult {
+  ALLOWED
+  ALLOWED_PROVISIONAL
+  DENIED_EXPIRED
+  DENIED_NO_PLAN
+}
+
+enum InvoiceKind {
+  PLAN
+  DAY_PASS
+  ROOM_OVERRUN
+  ROOM_HIRE
+  OPENING_BALANCE
+}
+
+enum InvoiceStatus {
+  UNPAID
+  PENDING_CONFIRMATION
+  PAID
+  VOID
+}
+
+enum PaymentMethod {
+  FLUTTERWAVE
+  TRANSFER
+  CASH
+}
+
+enum PaymentStatus {
+  CONFIRMED
+  REVERSED
+}
+
+enum PaymentAttemptStatus {
+  ACTIVE
+  SUCCEEDED
+  FAILED
+  ABANDONED
+}
+
+enum TransferReportStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+}
+
+enum AccountCreditStatus {
+  OPEN
+  APPLIED
+  REFUNDED
+}
+
+enum OpeningStatus {
+  DRAFT
+  APPROVED
+  REJECTED
+}
+
+enum ContactChannel {
+  WHATSAPP
+  SMS
+  PHONE_CALL
+  EMAIL
+}
+
+enum ConsentSource {
+  DESK
+  MEMBER_APP
+}
+
+enum AuthTokenPurpose {
+  MEMBER_INVITE
+  STAFF_INVITE
+  PASSWORD_RESET
+}
+
+enum InfoKind {
+  HOUSE_RULE
+  FAQ
+}
+
+enum AskQuestion {
+  TAKINGS
+  MEMBERS_PAID
+  WHO_OWES
+  PENDING_TRANSFERS
+  CASH_MATCH
+  ACTIVE_MEMBERS
+  EXPIRING_SOON
+  NEW_MEMBERS
+  TOP_PLAN
+  QUIET_MEMBERS
+  TOP_ROOM
+  BUSY_HOURS
+  OVERRUN_HOURS
+  NO_SHOWS
+  CHECKINS
+  TURNED_AWAY
+  KUJERA_FEE
+  UNKNOWN
+}
+
+enum AskPeriod {
+  TODAY
+  THIS_WEEK
+  THIS_MONTH
+  LAST_MONTH
+}
+
+enum AskOutcome {
+  ANSWERED
+  NOT_IN_LIST
+  MODEL_UNAVAILABLE
+}
+
+enum WebhookResult {
+  PROCESSED
+  DUPLICATE
+  BAD_SIGNATURE
+  AMOUNT_MISMATCH
+  UNKNOWN_REFERENCE
+  ALREADY_PAID
+}
+
+enum SubscriptionTier {
+  STARTER
+  GROWTH
+  LARGE
+}
+
+enum SubscriptionInvoiceStatus {
+  UNPAID
+  PAID
+  VOID
+}
+
+// ---------- Tenancy ----------
+
+model Organisation {
+  id                 String    @id @default(cuid())
+  name               String
+  slug               String    @unique
+  logoUrl            String?
+  address            String?
+  timezone           String    @default("Africa/Lagos")
+  cutoverDate        DateTime? @db.Date
+  goLiveAt           DateTime?
+  vatRegistered      Boolean   @default(false)
+  vatRateBasisPoints Int       @default(0) // 750 = 7.5%
+  paymentPublicKey   String? // the space's Flutterwave public key
+  graceDays          Int       @default(0)
+  creditsRollOver    Boolean   @default(false)
+  nextInvoiceNumber  Int       @default(1)
+  nextReceiptNumber  Int       @default(1)
+  dpaSignedAt        DateTime?
+  createdAt          DateTime  @default(now())
+
+  secret               OrganisationSecret?
+  locations            Location[]
+  sessions             Session[]
+  authTokens           AuthToken[]
+  members              Member[]
+  staff                Staff[]
+  consents             ContactConsent[]
+  plans                Plan[]
+  rooms                Room[]
+  infoEntries          InfoEntry[]
+  openingHours         OpeningHours[]
+  wifiNetworks         WifiNetwork[]
+  memberships          Membership[]
+  membershipEvents     MembershipEvent[]
+  creditEntries        CreditEntry[]
+  bookings             Booking[]
+  roomOverruns         RoomOverrun[]
+  checkIns             CheckIn[]
+  invoices             Invoice[]
+  paymentAttempts      PaymentAttempt[]
+  payments             Payment[]
+  receipts             Receipt[]
+  transferReports      TransferReport[]
+  accountCredits       AccountCredit[]
+  openingPositions     OpeningPosition[]
+  cashCounts           CashCount[]
+  subscriptionInvoices SubscriptionInvoice[]
+  askLogs              AskLog[]
+  webhookEvents        WebhookEvent[]
+  auditLogs            AuditLog[]
+}
+
+// Closed to the app role. Read and written only through SECURITY DEFINER functions.
+model OrganisationSecret {
+  organisationId      String       @id
+  organisation        Organisation @relation(fields: [organisationId], references: [id])
+  paymentSecretKeyEnc String // AES-256-GCM
+  webhookSecretEnc    String? // AES-256-GCM
+  updatedAt           DateTime     @updatedAt
+}
+
+model Location {
+  id             String       @id @default(cuid())
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  name           String
+  address        String?
+  createdAt      DateTime     @default(now())
+
+  rooms                Room[]
+  checkIns             CheckIn[]
+  subscriptionInvoices SubscriptionInvoice[]
+  openingHours         OpeningHours[]
+  wifiNetworks         WifiNetwork[]
+
+  @@index([organisationId])
+}
+
+// ---------- Identity ----------
+
+// Global: one login per person across spaces.
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique // lower-cased
+  emailVerifiedAt     DateTime?
+  passwordHash        String? // argon2id. Null until an invite is accepted.
+  failedPasswordCount Int       @default(0)
+  lockedUntil         DateTime?
+  createdAt           DateTime  @default(now())
+
+  members    Member[]
+  staff      Staff[]
+  sessions   Session[]
+  authTokens AuthToken[]
+}
+
+model Session {
+  id             String       @id @default(cuid())
+  tokenHash      String       @unique
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  actingAs       SessionRole
+  memberId       String?
+  staffId        String?
+  createdAt      DateTime     @default(now())
+  lastSeenAt     DateTime     @default(now())
+  expiresAt      DateTime
+  revokedAt      DateTime?
+
+  @@index([userId])
+  @@index([organisationId])
+}
+
+// Single-use links: member invites, helper invites, password resets. Only the hash is stored.
+model AuthToken {
+  id               String           @id @default(cuid())
+  purpose          AuthTokenPurpose
+  organisationId   String? // null for password resets
+  organisation     Organisation?    @relation(fields: [organisationId], references: [id])
+  userId           String? // set once the email has a login
+  user             User?            @relation(fields: [userId], references: [id])
+  email            String // lower-cased
+  memberId         String? // MEMBER_INVITE
+  staffRole        StaffRole? // STAFF_INVITE
+  tokenHash        String           @unique
+  expiresAt        DateTime
+  usedAt           DateTime?
+  cancelledAt      DateTime?
+  createdByStaffId String?
+  createdAt        DateTime         @default(now())
+
+  @@index([email, purpose])
+  @@index([organisationId, purpose])
+}
+
+// Pending self sign-up (FR-17). Global, like User. Closed to the app role.
+model SpaceSignup {
+  id                String    @id @default(cuid())
+  spaceName         String    @db.VarChar(120)
+  ownerName         String    @db.VarChar(120)
+  email             String // lower-cased
+  passwordHash      String // argon2id
+  dpaAcceptedAt     DateTime
+  tokenHash         String    @unique
+  expiresAt         DateTime
+  confirmedAt       DateTime?
+  organisationId    String? // set when confirmed
+  ipHash            String? // for sign-up rate limits
+  createdAt         DateTime  @default(now())
+
+  @@index([email, createdAt])
+}
+
+model Member {
+  id                      String          @id @default(cuid())
+  organisationId          String
+  organisation            Organisation    @relation(fields: [organisationId], references: [id])
+  userId                  String? // null until the invite is accepted
+  user                    User?           @relation(fields: [userId], references: [id])
+  fullName                String
+  email                   String // lower-cased, required for every member
+  phone                   String // E.164, for door lookup
+  memberCode              String // short code shown at the desk, e.g. "K0142"
+  checkInSecretEnc        String? // encrypted TOTP secret
+  preferredChannel        ContactChannel?
+  provisionalBlockedUntil DateTime? // 30 days after a rejected transfer report
+  createdByStaffId        String?
+  createdAt               DateTime        @default(now())
+
+  memberships      Membership[]
+  membershipEvents MembershipEvent[]
+  creditEntries    CreditEntry[]
+  bookings         Booking[]
+  roomOverruns     RoomOverrun[]
+  checkIns         CheckIn[]
+  invoices         Invoice[]
+  paymentAttempts  PaymentAttempt[]
+  payments         Payment[]
+  receipts         Receipt[]
+  transferReports  TransferReport[]
+  accountCredits   AccountCredit[]
+  consents         ContactConsent[]
+  openingPositions OpeningPosition[]
+
+  @@unique([organisationId, phone])
+  @@unique([organisationId, email])
+  @@unique([organisationId, memberCode])
+  @@unique([organisationId, userId])
+}
+
+model Staff {
+  id             String       @id @default(cuid())
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  displayName    String
+  role           StaffRole
+  active         Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+
+  @@unique([organisationId, userId])
+}
+
+// Append-only. Latest row per member and channel wins. Nothing is sent in version one.
+model ContactConsent {
+  id                String         @id @default(cuid())
+  organisationId    String
+  organisation      Organisation   @relation(fields: [organisationId], references: [id])
+  memberId          String
+  member            Member         @relation(fields: [memberId], references: [id])
+  channel           ContactChannel
+  consented         Boolean
+  source            ConsentSource
+  recordedByStaffId String?
+  recordedAt        DateTime       @default(now())
+
+  @@index([organisationId, memberId, channel, recordedAt])
+}
+
+// ---------- Plans, rooms, memberships ----------
+
+model Plan {
+  id                   String       @id @default(cuid())
+  organisationId       String
+  organisation         Organisation @relation(fields: [organisationId], references: [id])
+  name                 String
+  type                 PlanType
+  priceKobo            Int
+  durationDays         Int
+  roomMinutesPerPeriod Int          @default(0)
+  active               Boolean      @default(true)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  memberships      Membership[]
+  openingPositions OpeningPosition[]
+
+  @@index([organisationId, active])
+}
+
+model Room {
+  id             String       @id @default(cuid())
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  locationId     String
+  location       Location     @relation(fields: [locationId], references: [id])
+  name           String
+  capacity       Int
+  hourlyRateKobo Int
+  active         Boolean      @default(true)
+
+  bookings Booking[]
+
+  @@index([organisationId])
+}
+
+// ---------- Space info (FR-16, FR-26) ----------
+
+model InfoEntry {
+  id               String       @id @default(cuid())
+  organisationId   String
+  organisation     Organisation @relation(fields: [organisationId], references: [id])
+  kind             InfoKind
+  title            String       @db.VarChar(120) // rule heading or FAQ question
+  body             String       @db.VarChar(600)
+  sortOrder        Int          @default(0)
+  active           Boolean      @default(true)
+  updatedByStaffId String
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([organisationId, kind, active, sortOrder])
+}
+
+model OpeningHours {
+  id             String       @id @default(cuid())
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  locationId     String
+  location       Location     @relation(fields: [locationId], references: [id])
+  dayOfWeek      Int // 1 Monday to 7 Sunday
+  closed         Boolean      @default(false)
+  opensAtMinute  Int? // minutes after Lagos midnight, null when closed
+  closesAtMinute Int?
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([locationId, dayOfWeek])
+  @@index([organisationId])
+}
+
+model WifiNetwork {
+  id             String       @id @default(cuid())
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  locationId     String
+  location       Location     @relation(fields: [locationId], references: [id])
+  networkName    String       @db.VarChar(64)
+  password       String       @db.VarChar(64) // shown only to ACTIVE or PROVISIONAL members
+  note           String?      @db.VarChar(200)
+  active         Boolean      @default(true)
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organisationId, locationId])
+}
+
+model Membership {
+  id                   String           @id @default(cuid())
+  organisationId       String
+  organisation         Organisation     @relation(fields: [organisationId], references: [id])
+  memberId             String
+  member               Member           @relation(fields: [memberId], references: [id])
+  planId               String
+  plan                 Plan             @relation(fields: [planId], references: [id])
+  startDate            DateTime         @db.Date // Lagos calendar date
+  endDate              DateTime         @db.Date // last full day of access
+  status               MembershipStatus @default(SCHEDULED) // cache only, see FR-32
+  provisionalUntil     DateTime?
+  previousMembershipId String?
+  createdAt            DateTime         @default(now())
+
+  invoices      Invoice[]
+  creditEntries CreditEntry[]
+  bookings      Booking[]
+  checkIns      CheckIn[]
+  events        MembershipEvent[]
+
+  @@index([organisationId, memberId, endDate])
+  @@index([organisationId, status, endDate])
+}
+
+model MembershipEvent {
+  id             String              @id @default(cuid())
+  organisationId String
+  organisation   Organisation        @relation(fields: [organisationId], references: [id])
+  membershipId   String
+  membership     Membership          @relation(fields: [membershipId], references: [id])
+  memberId       String
+  member         Member              @relation(fields: [memberId], references: [id])
+  type           MembershipEventType
+  fromPlanId     String?
+  toPlanId       String?
+  actorStaffId   String?
+  at             DateTime            @default(now())
+
+  @@index([organisationId, memberId, at])
+}
+
+model CreditEntry {
+  id               String          @id @default(cuid())
+  organisationId   String
+  organisation     Organisation    @relation(fields: [organisationId], references: [id])
+  memberId         String
+  member           Member          @relation(fields: [memberId], references: [id])
+  membershipId     String
+  membership       Membership      @relation(fields: [membershipId], references: [id])
+  type             CreditEntryType
+  minutes          Int // positive adds, negative removes
+  bookingId        String?
+  booking          Booking?        @relation(fields: [bookingId], references: [id])
+  note             String?
+  createdByStaffId String?
+  createdAt        DateTime        @default(now())
+
+  @@index([organisationId, memberId, membershipId])
+}
+
+model Booking {
+  id                    String        @id @default(cuid())
+  organisationId        String
+  organisation          Organisation  @relation(fields: [organisationId], references: [id])
+  memberId              String
+  member                Member        @relation(fields: [memberId], references: [id])
+  roomId                String
+  room                  Room          @relation(fields: [roomId], references: [id])
+  source                BookingSource @default(MEMBER_CREDITS)
+  membershipId          String? // null for DESK_HIRE
+  membership            Membership?   @relation(fields: [membershipId], references: [id])
+  invoiceId             String? // set for DESK_HIRE
+  startAt               DateTime
+  endAt                 DateTime
+  status                BookingStatus @default(CONFIRMED)
+  minutesCharged        Int
+  cancelledAt           DateTime?
+  createdByStaffId      String? // null when the member booked
+  noShowMarkedByStaffId String?
+  createdAt             DateTime      @default(now())
+
+  creditEntries CreditEntry[]
+  overruns      RoomOverrun[]
+
+  @@index([organisationId, roomId, startAt])
+  @@index([organisationId, memberId, startAt])
+}
+
+model RoomOverrun {
+  id                String       @id @default(cuid())
+  organisationId    String
+  organisation      Organisation @relation(fields: [organisationId], references: [id])
+  bookingId         String
+  booking           Booking      @relation(fields: [bookingId], references: [id])
+  memberId          String
+  member            Member       @relation(fields: [memberId], references: [id])
+  extraMinutes      Int
+  recordedByStaffId String
+  creditEntryId     String?
+  invoiceId         String?
+  createdAt         DateTime     @default(now())
+
+  @@index([organisationId, createdAt])
+}
+
+model CheckIn {
+  id                String        @id @default(cuid())
+  organisationId    String
+  organisation      Organisation  @relation(fields: [organisationId], references: [id])
+  memberId          String
+  member            Member        @relation(fields: [memberId], references: [id])
+  membershipId      String?
+  membership        Membership?   @relation(fields: [membershipId], references: [id])
+  locationId        String
+  location          Location      @relation(fields: [locationId], references: [id])
+  method            CheckInMethod
+  result            CheckInResult
+  recordedOffline   Boolean       @default(false)
+  codeCheckFailed   Boolean       @default(false)
+  recordedByStaffId String
+  at                DateTime      @default(now())
+
+  @@index([organisationId, memberId, at])
+  @@index([organisationId, at])
+}
+
+// ---------- Money ----------
+
+model Invoice {
+  id                String        @id @default(cuid())
+  organisationId    String
+  organisation      Organisation  @relation(fields: [organisationId], references: [id])
+  memberId          String
+  member            Member        @relation(fields: [memberId], references: [id])
+  membershipId      String?
+  membership        Membership?   @relation(fields: [membershipId], references: [id])
+  kind              InvoiceKind
+  number            String // from Organisation.nextInvoiceNumber
+  description       String
+  amountKobo        Int // at most 2,000,000,000 kobo (₦20m)
+  vatKobo           Int           @default(0)
+  status            InvoiceStatus @default(UNPAID)
+  dueDate           DateTime      @db.Date
+  pendingSince      DateTime?
+  provisionalUsedAt DateTime? // one provisional window per invoice
+  paidAt            DateTime?
+  voidedAt          DateTime?
+  voidedByStaffId   String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  attempts        PaymentAttempt[]
+  payments        Payment[]
+  transferReports TransferReport[]
+
+  @@unique([organisationId, number])
+  @@index([organisationId, memberId, status])
+  @@index([organisationId, status, dueDate])
+}
+
+model PaymentAttempt {
+  id               String               @id @default(cuid())
+  organisationId   String
+  organisation     Organisation         @relation(fields: [organisationId], references: [id])
+  invoiceId        String
+  invoice          Invoice              @relation(fields: [invoiceId], references: [id])
+  memberId         String
+  member           Member               @relation(fields: [memberId], references: [id])
+  reference        String               @unique // Flutterwave tx_ref, never reused
+  amountKobo       Int
+  status           PaymentAttemptStatus @default(ACTIVE)
+  checkoutLink     String?
+  createdAt        DateTime             @default(now())
+  lastVerifiedAt   DateTime?
+
+  @@index([invoiceId, status])
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  organisationId        String
+  organisation          Organisation  @relation(fields: [organisationId], references: [id])
+  invoiceId             String
+  invoice               Invoice       @relation(fields: [invoiceId], references: [id])
+  memberId              String
+  member                Member        @relation(fields: [memberId], references: [id])
+  method                PaymentMethod
+  amountKobo            Int
+  providerReference     String?       @unique // Flutterwave tx_ref
+  providerTransactionId String?       @unique // Flutterwave transaction id
+  providerFeeKobo       Int?
+  status                PaymentStatus @default(CONFIRMED)
+  paidAt                DateTime
+  recordedByStaffId     String? // null for Flutterwave payments
+  recordedAt            DateTime      @default(now())
+  reversedAt            DateTime?
+  reversedByStaffId     String?
+  reversalReason        String?
+
+  receipt        Receipt?
+  transferReport TransferReport?
+  accountCredit  AccountCredit?
+
+  @@index([organisationId, recordedAt])
+  @@index([organisationId, memberId, paidAt])
+}
+
+model Receipt {
+  id             String       @id @default(cuid())
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  paymentId      String       @unique
+  payment        Payment      @relation(fields: [paymentId], references: [id])
+  memberId       String
+  member         Member       @relation(fields: [memberId], references: [id])
+  number         String // from Organisation.nextReceiptNumber
+  issuedAt       DateTime     @default(now())
+
+  @@unique([organisationId, number])
+}
+
+model TransferReport {
+  id               String               @id @default(cuid())
+  organisationId   String
+  organisation     Organisation         @relation(fields: [organisationId], references: [id])
+  invoiceId        String
+  invoice          Invoice              @relation(fields: [invoiceId], references: [id])
+  memberId         String
+  member           Member               @relation(fields: [memberId], references: [id])
+  senderName       String               @db.VarChar(80)
+  amountKobo       Int
+  transferredAt    DateTime
+  photo            Bytes? // 150 KB maximum
+  photoSizeBytes   Int?
+  status           TransferReportStatus @default(PENDING)
+  decidedByStaffId String?
+  decidedAt        DateTime?
+  rejectReason     String?
+  paymentId        String?              @unique
+  payment          Payment?             @relation(fields: [paymentId], references: [id])
+  createdAt        DateTime             @default(now())
+
+  @@index([organisationId, status, createdAt])
+}
+
+model AccountCredit {
+  id                String              @id @default(cuid())
+  organisationId    String
+  organisation      Organisation        @relation(fields: [organisationId], references: [id])
+  memberId          String
+  member            Member              @relation(fields: [memberId], references: [id])
+  sourcePaymentId   String              @unique
+  sourcePayment     Payment             @relation(fields: [sourcePaymentId], references: [id])
+  amountKobo        Int
+  status            AccountCreditStatus @default(OPEN)
+  resolvedByStaffId String?
+  resolvedAt        DateTime?
+  note              String?
+  createdAt         DateTime            @default(now())
+}
+
+model OpeningPosition {
+  id                String        @id @default(cuid())
+  organisationId    String
+  organisation      Organisation  @relation(fields: [organisationId], references: [id])
+  memberId          String
+  member            Member        @relation(fields: [memberId], references: [id])
+  planId            String
+  plan              Plan          @relation(fields: [planId], references: [id])
+  endDate           DateTime      @db.Date
+  amountOwedKobo    Int           @default(0)
+  roomMinutesLeft   Int           @default(0)
+  sourceNote        String?
+  status            OpeningStatus @default(DRAFT)
+  draftedByStaffId  String
+  approvedByStaffId String?
+  decidedAt         DateTime?
+  createdAt         DateTime      @default(now())
+
+  @@unique([organisationId, memberId])
+}
+
+model CashCount {
+  id               String       @id @default(cuid())
+  organisationId   String
+  organisation     Organisation @relation(fields: [organisationId], references: [id])
+  day              DateTime     @db.Date
+  countedKobo      Int
+  enteredByStaffId String
+  createdAt        DateTime     @default(now())
+
+  @@unique([organisationId, day])
+}
+
+model SubscriptionInvoice {
+  id                String                    @id @default(cuid())
+  organisationId    String
+  organisation      Organisation              @relation(fields: [organisationId], references: [id])
+  locationId        String
+  location          Location                  @relation(fields: [locationId], references: [id])
+  tier              SubscriptionTier
+  activeMemberCount Int
+  periodStart       DateTime                  @db.Date
+  periodEnd         DateTime                  @db.Date
+  amountKobo        Int
+  status            SubscriptionInvoiceStatus @default(UNPAID)
+  isTrial           Boolean                   @default(false)
+  providerReference String?                   @unique
+  paidAt            DateTime?
+  createdAt         DateTime                  @default(now())
+
+  @@unique([locationId, periodStart])
+  @@index([organisationId, status])
+}
+
+// ---------- Ask and system ----------
+
+model AskLog {
+  id               String       @id @default(cuid())
+  organisationId   String
+  organisation     Organisation @relation(fields: [organisationId], references: [id])
+  staffId          String
+  questionRedacted String       @db.VarChar(500)
+  question         AskQuestion
+  period           AskPeriod?
+  confidence       Float?
+  outcome          AskOutcome
+  modelName        String?
+  latencyMs        Int?
+  helpful          Boolean?
+  createdAt        DateTime     @default(now())
+
+  @@index([organisationId, createdAt])
+  @@index([organisationId, outcome, createdAt])
+}
+
+model WebhookEvent {
+  id             String         @id @default(cuid())
+  organisationId String?        // null for Kujera's own subscription webhook
+  organisation   Organisation?  @relation(fields: [organisationId], references: [id])
+  route          String // "space" or "kujera"
+  event          String
+  reference      String?
+  signatureValid Boolean
+  payload        Json
+  result         WebhookResult?
+  receivedAt     DateTime       @default(now())
+  processedAt    DateTime?
+
+  @@unique([route, event, reference])
+}
+
+model AuditLog {
+  id             String       @id @default(cuid())
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  actorStaffId   String?
+  actorUserId    String?
+  action         String // e.g. "payment.reverse", "transfer.confirm"
+  recordType     String
+  recordId       String
+  before         Json?
+  after          Json?
+  at             DateTime     @default(now())
+
+  @@index([organisationId, at])
+  @@index([organisationId, recordType, recordId])
+}
